@@ -1,0 +1,456 @@
+import { createContext, useContext, useState, ReactNode } from 'react';
+
+type Language = 'pt' | 'en';
+
+interface LanguageContextType {
+  language: Language;
+  setLanguage: (lang: Language) => void;
+  t: (key: string) => string;
+}
+
+const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
+
+const translations = {
+  pt: {
+    // Header
+    'header.projects': 'Projetos',
+    'header.about': 'Sobre',
+    'header.contact': 'Entrar em contato',
+    
+    // Hero
+    'hero.badge': 'UX & Product Designer',
+    'hero.title1': 'Transformo',
+    'hero.title2': 'complexidade',
+    'hero.title3': 'em experiências claras',
+    'hero.subtitle1': 'Especialista em produtos B2B, sistemas internos e produtos financeiros.',
+    'hero.subtitle2': 'Entrego soluções que equilibram impacto no negócio e valor para o usuário.',
+    'hero.cta': 'Ver projetos',
+    'hero.scroll': 'Scroll',
+    
+    // Projects
+    'projects.label': 'Portfolio — Projetos Selecionados',
+    'projects.title1': 'Trabalhos que',
+    'projects.title2': 'geraram impacto',
+    'projects.description': 'Casos onde pesquisa, estratégia e design resolveram problemas reais de usuários e negócio.',
+    'projects.view': 'Ver caso',
+    'projects.underConstruction': 'Em construção',
+    
+    // Project 1 - Portal do Parceiro
+    'project1.name': 'Como transformar pesquisa em decisões de UX para produtos B2B complexos?',
+    'project1.type': 'Portal do Parceiro | Saint-Gobain',
+    'project1.problem': 'Redesign baseado em evidências para reestruturar fluxos, hierarquia da informação e tomada de decisão em um portal B2B com regras e exceções complexas.',
+    'project1.impact': 'UX alinhado às regras de negócio desde a fase de descoberta',
+    
+    // Project 2 - PPW
+    'project2.name': 'Como estruturar a experiência inicial de um produto antes do login?',
+    'project2.type': 'PPW | Wiz',
+    'project2.problem': 'Criação da área não logada do PPW com foco em clareza da proposta de valor, organização da informação e direcionamento da jornada, equilibrando objetivos de negócio, branding e princípios de UX.',
+    'project2.impact': '52% mais cadastros qualificados',
+    
+    // Project 3 - Lensly
+    'project3.name': 'Evolução do Design System e Mobile',
+    'project3.type': 'Lensly',
+    'project3.problem': 'Atuação como apoio no amadurecimento do Design System e na adaptação da experiência para mobile, com foco em consistência visual, usabilidade e escalabilidade do produto.',
+    'project3.impact': '3x velocidade de desenvolvimento',
+    
+    // About
+    'about.label': 'Sobre',
+    'about.title': 'Designer que entende de negócio',
+    'about.p1': 'Sou UX Designer com foco em produtos digitais complexos, especialmente em contextos B2B. Tenho experiência em e-commerce corporativo, sistemas internos e produtos financeiros.',
+    'about.p2': 'Meu processo começa sempre com pesquisa: entrevistas, análise de dados, benchmarking. Acredito que boas decisões de design nascem de uma compreensão profunda do problema, não de intuições ou tendências.',
+    'about.p3': 'Trabalho bem em ambientes ágeis e com múltiplos stakeholders. Sei traduzir necessidades de negócio em experiências que funcionam para o usuário final.',
+    'about.p4': 'No final do dia, o que me move é ver um produto lançado, sendo usado, gerando valor.',
+    
+    // Footer
+    'footer.label': 'Contato',
+    'footer.title1': 'Vamos criar algo',
+    'footer.title2': 'impactante juntos?',
+    'footer.description': 'Estou aberto a novos projetos, colaborações e oportunidades. Se você tem um desafio de UX interessante, vamos conversar.',
+    'footer.email': 'Enviar e-mail',
+    'footer.connect': 'Conecte-se',
+    'footer.available': 'Disponível para novos projetos',
+    'footer.copyright': '© 2026 — Portfólio UX Designer',
+    'footer.location': 'Brasília, Brasil',
+    
+    // Portal do Parceiro
+    'portal.hero.title': 'Portal do Parceiro Saint-Gobain: Redesign Orientado por Pesquisa e Dados',
+    'portal.hero.subtitle': 'Transformando insights de usuários em decisões estratégicas de design para plataforma B2B crítica de distribuição',
+    'portal.hero.role': 'Product Designer',
+    'portal.hero.duration': '2 meses (dez/2025 - jan/2026)',
+    'portal.hero.company': 'Act Digital para Saint-Gobain',
+    'portal.hero.deliverables': 'Pesquisa qualitativa, benchmarking competitivo, redesign de interface',
+    
+    'portal.overview.label': 'Overview',
+    'portal.overview.title': 'O Contexto',
+    'portal.overview.p1': 'A Saint-Gobain é um grupo internacional que atua no desenvolvimento e distribuição de materiais para construção civil e indústria. No Brasil, está presente principalmente por meio de marcas amplamente conhecidas, como Quartzolit e Brasilit, cujos produtos chegam ao consumidor final por meio de lojistas e distribuidores. Esse modelo de negócio B2B envolve negociações recorrentes, regras comerciais específicas e diferentes perfis de parceiros.',
+    'portal.overview.p2': 'O Portal do Parceiro é a plataforma digital que centraliza essa relação comercial, permitindo que lojistas e distribuidores realizem atividades essenciais do dia a dia, como gestão de pedidos, acompanhamento de entregas e acesso a informações comerciais. Por concentrar processos críticos e operar com múltiplas regras e exceções, o portal desempenha um papel estratégico na eficiência operacional da empresa e na experiência dos parceiros.',
+    'portal.overview.imageCaption': 'Interface atual do Portal do Parceiro',
+    'portal.overview.featuresTitle': 'Funcionalidades Principais',
+    'portal.overview.feature1': 'Consulta de produtos, preços e disponibilidade',
+    'portal.overview.feature2': 'Realização de pedidos (E-shop)',
+    'portal.overview.feature3': 'Acompanhamento de status de pedidos',
+    'portal.overview.feature4': 'Acesso a informações financeiras e consultivas',
+    'portal.overview.feature5': 'Gestão completa da rotina de compra',
+    'portal.overview.critical': 'Por que é crítico:',
+    'portal.overview.criticalText': ' Esta é uma ferramenta operacional de alta recorrência, onde eficiência, clareza e previsibilidade impactam diretamente o faturamento da empresa e a satisfação dos parceiros comerciais.',
+    
+    'portal.challenge.label': 'O Desafio',
+    'portal.challenge.title': 'De redesign estético para estratégia orientada por dados',
+    'portal.challenge.p1': 'Inicialmente, a demanda dos stakeholders era simples: "queremos um visual diferente". Porém, ao invés de apenas redesenhar esteticamente, propus uma abordagem orientada por dados - entender primeiro como e por que os usuários usavam o Portal para então tomar decisões de design fundamentadas.',
+    'portal.challenge.roleTitle': 'Meu Papel',
+    'portal.challenge.role1': 'Concepção e condução completa da pesquisa qualitativa (roteiro, recrutamento, entrevistas, síntese)',
+    'portal.challenge.role2': 'Benchmarking competitivo com players internacionais de referência',
+    'portal.challenge.role3': 'Redesign da interface baseado em insights e melhores práticas',
+    'portal.challenge.role4': 'Apresentação e defesa das decisões junto aos stakeholders',
+    
+    'portal.research.label': 'Processo de Pesquisa',
+    'portal.research.title': 'Pesquisa Qualitativa com Usuários',
+    'portal.research.objectiveTitle': 'Objetivo',
+    'portal.research.objective': 'Compreender como os parceiros utilizam o Portal no dia a dia, identificando comportamentos, dificuldades recorrentes e oportunidades de melhoria na experiência.',
+    'portal.research.methodTitle': 'Método',
+    'portal.research.method1': 'Realizei 5 entrevistas qualitativas em profundidade com usuários reais do Portal, abrangendo diferentes perfis:',
+    'portal.research.profile1': 'Operadores de compras',
+    'portal.research.profile2': 'Responsáveis por logística',
+    'portal.research.profile3': 'Administradores de loja',
+    'portal.research.method2': 'As entrevistas foram semi-estruturadas, permitindo explorar tanto comportamentos padronizados quanto percepções subjetivas sobre a ferramenta.',
+    'portal.research.insightsTitle': 'Principais Insights Descobertos',
+    'portal.insight1.title': 'Recompra não facilitada',
+    'portal.insight1.desc': 'Usuários refazem pedidos recorrentes manualmente, do zero. Alto volume de compras repetidas sem nenhum atalho ou histórico acessível, gerando perda de eficiência operacional significativa.',
+    'portal.insight2.title': 'Baixa visibilidade do status do pedido',
+    'portal.insight2.desc': 'Impossibilidade de acompanhar etapas (bloqueado, liberado, faturado, entregue). Dependência do vendedor para obter informações básicas, causando insegurança e ansiedade na espera.',
+    'portal.insight3.title': 'Uso predominante da barra de pesquisa',
+    'portal.insight3.desc': 'Busca direta por nome/código é o principal meio de navegação. Categorias, banners e vitrines têm baixíssimo uso real - usuários "pulam" o conteúdo editorial e vão direto ao ponto.',
+    'portal.insight4.title': 'Dependência estrutural do vendedor',
+    'portal.insight4.desc': 'Ajustes simples (preços, produtos, status) ainda exigem contato humano. Portal não entrega autonomia completa, gerando alto volume de interações que poderiam ser resolvidas na interface.',
+    'portal.insight5.title': 'Catálogo multimarcas pouco claro',
+    'portal.insight5.desc': 'Existe interesse em outras marcas além da Saint-Gobain, mas falta clareza sobre o que está disponível no Portal.',
+    'portal.research.impact': 'Impacto desses achados:',
+    'portal.research.impactText': ' Embora o Portal fosse bem avaliado, havia barreiras claras afetando eficiência operacional, autonomia do usuário e potencial de recorrência de compra.',
+    
+    'portal.benchmark.label': 'Benchmarking',
+    'portal.benchmark.title': 'Análise Competitiva Internacional',
+    'portal.benchmark.intro': 'Para complementar os insights qualitativos, analisei players de referência global em e-commerce B2B industrial:',
+    'portal.benchmark.imageCaption': 'Análise comparativa com players de referência global',
+    'portal.benchmark.fastenal.name': 'Fastenal',
+    'portal.benchmark.fastenal.desc': 'Referência em e-commerce B2B para construção e indústria nos EUA.',
+    'portal.benchmark.fastenal.pro1': 'Barra de busca como elemento dominante',
+    'portal.benchmark.fastenal.pro2': 'Menu industrial organizado por função',
+    'portal.benchmark.fastenal.pro3': 'Modelo orientado a compras recorrentes',
+    'portal.benchmark.fastenal.con1': 'Interface visualmente rígida e pouco moderna',
+    'portal.benchmark.fastenal.con2': 'Curva de aprendizado para usuários novos',
+    'portal.benchmark.grainger.name': 'Grainger',
+    'portal.benchmark.grainger.desc': 'Um dos maiores e-commerces B2B do mundo.',
+    'portal.benchmark.grainger.pro1': 'Barra de busca dominante',
+    'portal.benchmark.grainger.pro2': 'Links de atalho para listas e histórico',
+    'portal.benchmark.grainger.pro3': 'Busca avançada e PLP altamente filtrável',
+    'portal.benchmark.grainger.con1': 'Layout funcional mas visualmente datado',
+    'portal.benchmark.grainger.con2': 'Pode parecer técnico demais para novos usuários',
+    'portal.benchmark.prosLabel': 'Pontos Positivos',
+    'portal.benchmark.consLabel': 'Pontos de Atenção',
+    'portal.benchmark.conclusion': 'Conclusão do Benchmarking:',
+    'portal.benchmark.conclusionText': ' A barra de pesquisa é tratada como elemento central da experiência em todos os players de referência. A navegação por categorias existe, mas é secundária. A prioridade é velocidade e objetividade para usuários recorrentes.',
+    
+    'portal.decision.label': 'Decisão Estratégica',
+    'portal.decision.title': 'Barra de Pesquisa como Protagonista',
+    'portal.decision.intro': 'Cruzando os dados da pesquisa qualitativa com o benchmarking, ficou claro que:',
+    'portal.decision.data1Label': 'Dado de pesquisa:',
+    'portal.decision.data1': '"Uso predominante da barra de pesquisa - busca direta por nome/código é o principal meio de navegação"',
+    'portal.decision.data2Label': 'Dado de benchmark:',
+    'portal.decision.data2': 'Todos os players de referência tratam a busca como elemento dominante da interface',
+    'portal.decision.data3Label': 'Contexto de uso:',
+    'portal.decision.data3': 'Usuários B2B são recorrentes, técnicos e orientados a tarefas - eles sabem o que querem e precisam de velocidade',
+    'portal.decision.solutionTitle': 'Solução Implementada',
+    'portal.decision.solution1': 'Barra de pesquisa posicionada como elemento hero da interface',
+    'portal.decision.solution2': 'Destaque visual máximo (tamanho, contraste, localização)',
+    'portal.decision.solution3': 'Placeholder descritivo orientando uso',
+    'portal.decision.solution4': 'Acessibilidade garantida em qualquer ponto da navegação',
+    'portal.decision.impactTitle': 'Impacto Esperado',
+    'portal.decision.impact1': '↓ Redução do tempo médio para encontrar produtos',
+    'portal.decision.impact2': '↓ Menor fricção em compras recorrentes',
+    'portal.decision.impact3': '↑ Alinhamento com comportamento real dos usuários',
+    
+    'portal.solution.label': 'Solução Final',
+    'portal.solution.title': 'Redesign da Homepage',
+    'portal.solution.intro': 'O redesign priorizou eficiência operacional e autonomia do usuário, com hierarquia visual clara e foco em ações primárias.',
+    'portal.solution.beforeLabel': 'Antes',
+    'portal.solution.afterLabel': 'Depois',
+    'portal.solution.changesTitle': 'Principais Mudanças',
+    'portal.solution.change1Title': '1. Barra de pesquisa hero',
+    'portal.solution.change1': 'Posição central e destaque visual. Primeiro elemento que o usuário vê, alinhada com comportamento observado.',
+    'portal.solution.change2Title': '2. Acesso rápido a pedidos',
+    'portal.solution.change2': 'Visibilidade do histórico de compras. Facilita recompra recorrente e reduz dependência do vendedor.',
+    'portal.solution.change3Title': '3. Hierarquia de informação clara',
+    'portal.solution.change3': 'Conteúdo editorial secundário. Foco em ações operacionais. Design limpo e profissional.',
+    'portal.solution.change4Title': '4. Navegação intuitiva',
+    'portal.solution.change4': 'Categorias acessíveis mas não invasivas. Filtros contextuais. Estrutura escalável.',
+    'portal.solution.homepageCaption': 'Homepage completa com barra de pesquisa em destaque e acesso rápido a pedidos',
+    'portal.solution.productCaption': 'Página de produto com informações organizadas e hierarquia visual clara',
+    
+    'portal.validation.label': 'Validação',
+    'portal.validation.title': 'Recepção e Status do Projeto',
+    'portal.validation.intro': 'O redesign foi apresentado aos stakeholders de negócio e produto, sendo muito bem recebido. As principais validações foram:',
+    'portal.validation.point1': 'Decisões fundamentadas em dados reais (não apenas opinião estética)',
+    'portal.validation.point2': 'Alinhamento com comportamento observado dos usuários',
+    'portal.validation.point3': 'Referências sólidas de mercado (benchmarking internacional)',
+    'portal.validation.point4': 'Potencial claro de impacto no negócio (eficiência operacional e autonomia)',
+    'portal.validation.statusTitle': 'Status do Projeto',
+    'portal.validation.status': 'Por questões organizacionais, deixei a empresa em janeiro/2026, quando o projeto estava pronto para entrar em desenvolvimento. O trabalho de pesquisa, estratégia e design estava completo e validado.',
+    
+    'portal.learnings.label': 'Aprendizados',
+    'portal.learnings.title': 'Reflexões sobre o processo',
+    'portal.learnings.research.title': 'Sobre Pesquisa e Estratégia',
+    'portal.learnings.research.intro': 'Liderar uma pesquisa qualitativa do zero me ensinou:',
+    'portal.learnings.research.point1': 'A importância de fazer as perguntas certas (roteiro bem estruturado)',
+    'portal.learnings.research.point2': 'Como criar ambiente confortável para usuários se abrirem',
+    'portal.learnings.research.point3': 'A diferença entre o que stakeholders acham e o que usuários fazem',
+    'portal.learnings.research.point4': 'Como sintetizar dados qualitativos em insights acionáveis',
+    'portal.learnings.combination': 'A combinação de pesquisa + benchmarking é poderosa:',
+    'portal.learnings.combinationText': ' Pesquisa mostra o quê está acontecendo. Benchmarking mostra como outros resolveram problemas similares. Juntos, criam convicção para decisões estratégicas.',
+    'portal.learnings.design.title': 'Sobre Design Orientado por Dados',
+    'portal.learnings.design.text': 'Esse projeto reforçou algo fundamental: design não é sobre gosto pessoal. É sobre entender o usuário profundamente, identificar padrões e comportamentos reais, tomar decisões que resolvam problemas reais, e ser capaz de defender essas decisões com dados.',
+    'portal.learnings.b2b.title': 'Sobre Trabalho em Produto B2B',
+    'portal.learnings.b2b.text': 'Produtos B2B têm particularidades: usuários são recorrentes e experientes, eficiência operacional é crítica, beleza visual importa mas nunca à custa de usabilidade, e pequenas melhorias de UX geram impacto massivo em escala.',
+    
+    'portal.future.label': 'Próximos Passos',
+    'portal.future.title': 'Direções Futuras',
+    'portal.future.intro': 'Se o projeto tivesse continuado, as próximas evoluções seriam:',
+    'portal.future.phase2.title': 'Fase 2 - Recompra Facilitada',
+    'portal.future.phase2.desc': 'Funcionalidade "Comprar novamente" com 1 clique, listas de produtos favoritos/frequentes e sugestões inteligentes baseadas em histórico.',
+    'portal.future.phase3.title': 'Fase 3 - Visibilidade de Status',
+    'portal.future.phase3.desc': 'Timeline visual do pedido, notificações proativas sobre mudanças de status, redução da ansiedade e dependência do vendedor.',
+    'portal.future.phase4.title': 'Fase 4 - Catálogo Multimarcas',
+    'portal.future.phase4.desc': 'Clareza sobre quais marcas do grupo estão disponíveis no Portal, facilitando cross-selling e aumentando ticket médio.',
+  },
+  en: {
+    // Header
+    'header.projects': 'Projects',
+    'header.about': 'About',
+    'header.contact': 'Get in touch',
+    
+    // Hero
+    'hero.badge': 'UX & Product Designer',
+    'hero.title1': 'Transforming',
+    'hero.title2': 'complexity',
+    'hero.title3': 'into clear experiences',
+    'hero.subtitle1': 'Specialist in B2B products, internal systems, and financial products.',
+    'hero.subtitle2': 'I deliver solutions that balance business impact and user value.',
+    'hero.cta': 'View projects',
+    'hero.scroll': 'Scroll',
+    
+    // Projects
+    'projects.label': 'Portfolio — Selected Projects',
+    'projects.title1': 'Work that',
+    'projects.title2': 'generated impact',
+    'projects.description': 'Cases where research, strategy, and design solved real user and business problems.',
+    'projects.view': 'View case',
+    'projects.underConstruction': 'Under construction',
+    
+    // Project 1 - Partner Portal
+    'project1.name': 'How to transform research into UX decisions for complex B2B products?',
+    'project1.type': 'Partner Portal | Saint-Gobain',
+    'project1.problem': 'Evidence-based redesign to restructure flows, information hierarchy, and decision-making in a B2B portal with complex rules and exceptions.',
+    'project1.impact': 'UX aligned with business rules from the discovery phase',
+    
+    // Project 2 - PPW
+    'project2.name': 'How to structure the initial experience of a product before login?',
+    'project2.type': 'PPW | Wiz',
+    'project2.problem': 'Creation of PPW\'s non-logged area focusing on clarity of value proposition, information organization, and journey guidance, balancing business objectives, branding, and UX principles.',
+    'project2.impact': '52% more qualified registrations',
+    
+    // Project 3 - Lensly
+    'project3.name': 'Design System Evolution and Mobile',
+    'project3.type': 'Lensly',
+    'project3.problem': 'Supporting the Design System maturation and mobile experience adaptation, focusing on visual consistency, usability, and product scalability.',
+    'project3.impact': '3x development speed',
+    
+    // About
+    'about.label': 'About',
+    'about.title': 'Designer who understands business',
+    'about.p1': 'I\'m a UX Designer focused on complex digital products, especially in B2B contexts. I have experience in corporate e-commerce, internal systems, and financial products.',
+    'about.p2': 'My process always starts with research: interviews, data analysis, benchmarking. I believe good design decisions come from a deep understanding of the problem, not from intuition or trends.',
+    'about.p3': 'I work well in agile environments and with multiple stakeholders. I know how to translate business needs into experiences that work for the end user.',
+    'about.p4': 'At the end of the day, what drives me is seeing a product launched, being used, generating value.',
+    
+    // Footer
+    'footer.label': 'Contact',
+    'footer.title1': 'Let\'s create something',
+    'footer.title2': 'impactful together?',
+    'footer.description': 'I\'m open to new projects, collaborations, and opportunities. If you have an interesting UX challenge, let\'s talk.',
+    'footer.email': 'Send email',
+    'footer.connect': 'Connect',
+    'footer.available': 'Available for new projects',
+    'footer.copyright': '© 2026 — UX Designer Portfolio',
+    'footer.location': 'Brasília, Brazil',
+    
+    // Portal do Parceiro
+    'portal.hero.title': 'Saint-Gobain Partner Portal: Research and Data-Driven Redesign',
+    'portal.hero.subtitle': 'Transforming user insights into strategic design decisions for a critical B2B distribution platform',
+    'portal.hero.role': 'Product Designer',
+    'portal.hero.duration': '2 months (Dec/2025 - Jan/2026)',
+    'portal.hero.company': 'Act Digital for Saint-Gobain',
+    'portal.hero.deliverables': 'Qualitative research, competitive benchmarking, interface redesign',
+    
+    'portal.overview.label': 'Overview',
+    'portal.overview.title': 'The Context',
+    'portal.overview.p1': 'Saint-Gobain is an international group operating in the development and distribution of materials for construction and industry. In Brazil, it is primarily present through widely known brands such as Quartzolit and Brasilit, whose products reach the end consumer through retailers and distributors. This B2B business model involves recurring negotiations, specific commercial rules, and different partner profiles.',
+    'portal.overview.p2': 'The Partner Portal is the digital platform that centralizes this commercial relationship, allowing retailers and distributors to carry out essential day-to-day activities such as order management, delivery tracking, and access to commercial information. By concentrating critical processes and operating with multiple rules and exceptions, the portal plays a strategic role in the company\'s operational efficiency and the partners\' experience.',
+    'portal.overview.imageCaption': 'Current interface of the Partner Portal',
+    'portal.overview.featuresTitle': 'Main Features',
+    'portal.overview.feature1': 'Product, price, and availability inquiry',
+    'portal.overview.feature2': 'Order placement (E-shop)',
+    'portal.overview.feature3': 'Order status tracking',
+    'portal.overview.feature4': 'Access to financial and advisory information',
+    'portal.overview.feature5': 'Complete purchase routine management',
+    'portal.overview.critical': 'Why it\'s critical:',
+    'portal.overview.criticalText': ' This is a high-frequency operational tool, where efficiency, clarity, and predictability directly impact the company\'s revenue and partner satisfaction.',
+    
+    'portal.challenge.label': 'The Challenge',
+    'portal.challenge.title': 'From aesthetic redesign to data-driven strategy',
+    'portal.challenge.p1': 'Initially, the stakeholders\' request was simple: "we want a different look". However, instead of just redesigning aesthetically, I proposed a data-driven approach - first understanding how and why users used the Portal, then making informed design decisions.',
+    'portal.challenge.roleTitle': 'My Role',
+    'portal.challenge.role1': 'Complete conception and execution of qualitative research (script, recruitment, interviews, synthesis)',
+    'portal.challenge.role2': 'Competitive benchmarking with international reference players',
+    'portal.challenge.role3': 'Interface redesign based on insights and best practices',
+    'portal.challenge.role4': 'Presentation and defense of decisions to stakeholders',
+    
+    'portal.research.label': 'Research Process',
+    'portal.research.title': 'Qualitative User Research',
+    'portal.research.objectiveTitle': 'Objective',
+    'portal.research.objective': 'Understand how partners use the Portal in their daily routine, identifying behaviors, recurring difficulties, and opportunities to improve the experience.',
+    'portal.research.methodTitle': 'Method',
+    'portal.research.method1': 'I conducted 5 in-depth qualitative interviews with real Portal users, covering different profiles:',
+    'portal.research.profile1': 'Purchase operators',
+    'portal.research.profile2': 'Logistics managers',
+    'portal.research.profile3': 'Store administrators',
+    'portal.research.method2': 'The interviews were semi-structured, allowing exploration of both standardized behaviors and subjective perceptions about the tool.',
+    'portal.research.insightsTitle': 'Main Insights Discovered',
+    'portal.insight1.title': 'Repurchase not facilitated',
+    'portal.insight1.desc': 'Users manually redo recurring orders from scratch. High volume of repeat purchases without any shortcut or accessible history, generating significant operational efficiency loss.',
+    'portal.insight2.title': 'Low visibility of order status',
+    'portal.insight2.desc': 'Impossibility of tracking stages (blocked, released, invoiced, delivered). Dependence on the seller to obtain basic information, causing insecurity and anxiety while waiting.',
+    'portal.insight3.title': 'Predominant use of search bar',
+    'portal.insight3.desc': 'Direct search by name/code is the main means of navigation. Categories, banners, and showcases have very low actual use - users "skip" editorial content and go straight to the point.',
+    'portal.insight4.title': 'Structural dependence on seller',
+    'portal.insight4.desc': 'Simple adjustments (prices, products, status) still require human contact. Portal doesn\'t deliver complete autonomy, generating high volume of interactions that could be resolved in the interface.',
+    'portal.insight5.title': 'Unclear multi-brand catalog',
+    'portal.insight5.desc': 'There is interest in other brands besides Saint-Gobain, but there is a lack of clarity about what is available in the Portal.',
+    'portal.research.impact': 'Impact of these findings:',
+    'portal.research.impactText': ' Although the Portal was well evaluated, there were clear barriers affecting operational efficiency, user autonomy, and purchase recurrence potential.',
+    
+    'portal.benchmark.label': 'Benchmarking',
+    'portal.benchmark.title': 'International Competitive Analysis',
+    'portal.benchmark.intro': 'To complement the qualitative insights, I analyzed global reference players in B2B industrial e-commerce:',
+    'portal.benchmark.imageCaption': 'Comparative analysis with global reference players',
+    'portal.benchmark.fastenal.name': 'Fastenal',
+    'portal.benchmark.fastenal.desc': 'Reference in B2B e-commerce for construction and industry in the USA.',
+    'portal.benchmark.fastenal.pro1': 'Search bar as dominant element',
+    'portal.benchmark.fastenal.pro2': 'Industrial menu organized by function',
+    'portal.benchmark.fastenal.pro3': 'Model oriented towards recurring purchases',
+    'portal.benchmark.fastenal.con1': 'Visually rigid and not very modern interface',
+    'portal.benchmark.fastenal.con2': 'Learning curve for new users',
+    'portal.benchmark.grainger.name': 'Grainger',
+    'portal.benchmark.grainger.desc': 'One of the largest B2B e-commerces in the world.',
+    'portal.benchmark.grainger.pro1': 'Dominant search bar',
+    'portal.benchmark.grainger.pro2': 'Shortcut links to lists and history',
+    'portal.benchmark.grainger.pro3': 'Advanced search and highly filterable PLP',
+    'portal.benchmark.grainger.con1': 'Functional but visually dated layout',
+    'portal.benchmark.grainger.con2': 'May seem too technical for new users',
+    'portal.benchmark.prosLabel': 'Positive Points',
+    'portal.benchmark.consLabel': 'Points of Attention',
+    'portal.benchmark.conclusion': 'Benchmarking Conclusion:',
+    'portal.benchmark.conclusionText': ' The search bar is treated as the central element of the experience in all reference players. Category navigation exists, but it is secondary. The priority is speed and objectivity for recurring users.',
+    
+    'portal.decision.label': 'Strategic Decision',
+    'portal.decision.title': 'Search Bar as Protagonist',
+    'portal.decision.intro': 'Crossing the qualitative research data with benchmarking, it became clear that:',
+    'portal.decision.data1Label': 'Research data:',
+    'portal.decision.data1': '"Predominant use of search bar - direct search by name/code is the main means of navigation"',
+    'portal.decision.data2Label': 'Benchmark data:',
+    'portal.decision.data2': 'All reference players treat search as the dominant element of the interface',
+    'portal.decision.data3Label': 'Usage context:',
+    'portal.decision.data3': 'B2B users are recurring, technical, and task-oriented - they know what they want and need speed',
+    'portal.decision.solutionTitle': 'Implemented Solution',
+    'portal.decision.solution1': 'Search bar positioned as hero element of the interface',
+    'portal.decision.solution2': 'Maximum visual emphasis (size, contrast, location)',
+    'portal.decision.solution3': 'Descriptive placeholder guiding usage',
+    'portal.decision.solution4': 'Accessibility guaranteed at any navigation point',
+    'portal.decision.impactTitle': 'Expected Impact',
+    'portal.decision.impact1': '↓ Reduction in average time to find products',
+    'portal.decision.impact2': '↓ Less friction in recurring purchases',
+    'portal.decision.impact3': '↑ Alignment with actual user behavior',
+    
+    'portal.solution.label': 'Final Solution',
+    'portal.solution.title': 'Homepage Redesign',
+    'portal.solution.intro': 'The redesign prioritized operational efficiency and user autonomy, with clear visual hierarchy and focus on primary actions.',
+    'portal.solution.beforeLabel': 'Before',
+    'portal.solution.afterLabel': 'After',
+    'portal.solution.changesTitle': 'Main Changes',
+    'portal.solution.change1Title': '1. Hero search bar',
+    'portal.solution.change1': 'Central position and visual emphasis. First element the user sees, aligned with observed behavior.',
+    'portal.solution.change2Title': '2. Quick access to orders',
+    'portal.solution.change2': 'Visibility of purchase history. Facilitates recurring repurchase and reduces dependence on seller.',
+    'portal.solution.change3Title': '3. Clear information hierarchy',
+    'portal.solution.change3': 'Secondary editorial content. Focus on operational actions. Clean and professional design.',
+    'portal.solution.change4Title': '4. Intuitive navigation',
+    'portal.solution.change4': 'Accessible but not intrusive categories. Contextual filters. Scalable structure.',
+    'portal.solution.homepageCaption': 'Complete homepage with featured search bar and quick access to orders',
+    'portal.solution.productCaption': 'Product page with organized information and clear visual hierarchy',
+    
+    'portal.validation.label': 'Validation',
+    'portal.validation.title': 'Reception and Project Status',
+    'portal.validation.intro': 'The redesign was presented to business and product stakeholders and was very well received. The main validations were:',
+    'portal.validation.point1': 'Decisions based on real data (not just aesthetic opinion)',
+    'portal.validation.point2': 'Alignment with observed user behavior',
+    'portal.validation.point3': 'Solid market references (international benchmarking)',
+    'portal.validation.point4': 'Clear potential for business impact (operational efficiency and autonomy)',
+    'portal.validation.statusTitle': 'Project Status',
+    'portal.validation.status': 'For organizational reasons, I left the company in January/2026, when the project was ready to enter development. The research, strategy, and design work was complete and validated.',
+    
+    'portal.learnings.label': 'Learnings',
+    'portal.learnings.title': 'Reflections on the process',
+    'portal.learnings.research.title': 'About Research and Strategy',
+    'portal.learnings.research.intro': 'Leading a qualitative research from scratch taught me:',
+    'portal.learnings.research.point1': 'The importance of asking the right questions (well-structured script)',
+    'portal.learnings.research.point2': 'How to create a comfortable environment for users to open up',
+    'portal.learnings.research.point3': 'The difference between what stakeholders think and what users do',
+    'portal.learnings.research.point4': 'How to synthesize qualitative data into actionable insights',
+    'portal.learnings.combination': 'The combination of research + benchmarking is powerful:',
+    'portal.learnings.combinationText': ' Research shows what is happening. Benchmarking shows how others solved similar problems. Together, they create conviction for strategic decisions.',
+    'portal.learnings.design.title': 'About Data-Driven Design',
+    'portal.learnings.design.text': 'This project reinforced something fundamental: design is not about personal taste. It\'s about deeply understanding the user, identifying real patterns and behaviors, making decisions that solve real problems, and being able to defend those decisions with data.',
+    'portal.learnings.b2b.title': 'About Working on B2B Products',
+    'portal.learnings.b2b.text': 'B2B products have particularities: users are recurring and experienced, operational efficiency is critical, visual beauty matters but never at the expense of usability, and small UX improvements generate massive impact at scale.',
+    
+    'portal.future.label': 'Next Steps',
+    'portal.future.title': 'Future Directions',
+    'portal.future.intro': 'If the project had continued, the next evolutions would be:',
+    'portal.future.phase2.title': 'Phase 2 - Facilitated Repurchase',
+    'portal.future.phase2.desc': '"Buy again" functionality with 1 click, favorite/frequent product lists, and smart suggestions based on history.',
+    'portal.future.phase3.title': 'Phase 3 - Status Visibility',
+    'portal.future.phase3.desc': 'Visual timeline of the order, proactive notifications about status changes, reduction of anxiety and dependence on the seller.',
+    'portal.future.phase4.title': 'Phase 4 - Multi-brand Catalog',
+    'portal.future.phase4.desc': 'Clarity about which group brands are available in the Portal, facilitating cross-selling and increasing average ticket.',
+  },
+};
+
+export function LanguageProvider({ children }: { children: ReactNode }) {
+  const [language, setLanguage] = useState<Language>('pt');
+
+  const t = (key: string): string => {
+    return translations[language][key as keyof typeof translations.pt] || key;
+  };
+
+  return (
+    <LanguageContext.Provider value={{ language, setLanguage, t }}>
+      {children}
+    </LanguageContext.Provider>
+  );
+}
+
+export function useLanguage() {
+  const context = useContext(LanguageContext);
+  if (context === undefined) {
+    throw new Error('useLanguage must be used within a LanguageProvider');
+  }
+  return context;
+}
