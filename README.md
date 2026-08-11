@@ -1,11 +1,27 @@
+# Portfólio — Victor Werneck
 
-  # Portifólio | Final
+Portfólio de UX & Product Design construído com React, TypeScript, Vite e Tailwind CSS.
 
-  This is a code bundle for Portifólio | Final. The original project is available at https://www.figma.com/design/TSraO3yL5CijQa15gFP33x/Portif%C3%B3lio-%7C-Final.
+## Desenvolvimento local
 
-  ## Running the code
+Requisitos: Node.js 20 ou superior.
 
-  Run `npm i` to install the dependencies.
+```bash
+npm install
+npm run dev
+```
 
-  Run `npm run dev` to start the development server.
-  
+## Verificações
+
+```bash
+npm run typecheck
+npm run build
+```
+
+## Estrutura de conteúdo
+
+O catálogo de projetos fica em `src/content/projects.ts`. Projetos publicados possuem rota em `/projetos/:slug`; projetos ainda em produção permanecem visíveis como rascunhos sem link público.
+
+## Publicação
+
+O projeto é publicado na Vercel. O arquivo `vercel.json` direciona URLs internas para a aplicação, permitindo abrir e compartilhar estudos de caso diretamente.

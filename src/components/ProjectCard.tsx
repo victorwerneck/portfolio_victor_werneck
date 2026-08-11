@@ -1,43 +1,28 @@
 import { ImageWithFallback } from './figma/ImageWithFallback';
-import { ArrowUpRight, LucideIcon } from 'lucide-react';
+import { ArrowUpRight } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
+import { Link } from 'react-router-dom';
 
 interface Project {
-  id: number;
-  caseId?: string;
+  id: string;
   name: string;
   type: string;
-  role?: string;
   problem: string;
   impact?: string;
-  icon: LucideIcon;
   imageUrl: string;
+  href: string;
   underConstruction?: boolean;
 }
 
 interface ProjectCardProps {
   project: Project;
-  index: number;
-  onClick?: () => void;
 }
 
-export function ProjectCard({ project, index, onClick }: ProjectCardProps) {
-  const Icon = project.icon;
+export function ProjectCard({ project }: ProjectCardProps) {
   const { t } = useLanguage();
 
-  const handleClick = () => {
-    if (onClick && !project.underConstruction) {
-      onClick();
-    }
-  };
-
-  return (
-    <article
-      onClick={handleClick}
-      className={`group bg-white overflow-hidden hover:shadow-2xl hover:shadow-neutral-900/5 transition-all duration-700 border border-neutral-200 flex flex-col h-full ${
-        project.underConstruction ? 'cursor-not-allowed opacity-75' : 'cursor-pointer'
-      }`}
-    >
+  const content = (
+    <article className={`group bg-white overflow-hidden hover:shadow-2xl hover:shadow-neutral-900/5 transition-all duration-700 border border-neutral-200 flex flex-col h-full ${project.underConstruction ? 'opacity-75' : ''}`}>
       {/* Image Section */}
       <div className="relative h-[320px] overflow-hidden bg-neutral-100">
         <ImageWithFallback
@@ -83,8 +68,23 @@ export function ProjectCard({ project, index, onClick }: ProjectCardProps) {
           <p className="text-sm text-neutral-700 leading-relaxed">
             {project.problem}
           </p>
+          {project.impact && (
+            <p className="mt-6 pt-6 border-t border-neutral-200 text-sm font-medium text-neutral-900">
+              {project.impact}
+            </p>
+          )}
         </div>
       </div>
     </article>
+  );
+
+  if (project.underConstruction) {
+    return <div aria-disabled="true">{content}</div>;
+  }
+
+  return (
+    <Link to={project.href} aria-label={`${t('projects.view')}: ${project.name}`}>
+      {content}
+    </Link>
   );
 }

@@ -1,5 +1,4 @@
-import { useState } from 'react';
-import { LanguageProvider } from './contexts/LanguageContext';
+import { Navigate, Route, Routes, useNavigate } from 'react-router-dom';
 import { Header } from './components/Header';
 import { Hero } from './components/Hero';
 import { FeaturedProjects } from './components/FeaturedProjects';
@@ -8,33 +7,34 @@ import { Footer } from './components/Footer';
 import { PortalDoParceiro } from './pages/PortalDoParceiro';
 
 export default function App() {
-  const [currentPage, setCurrentPage] = useState<'home' | 'portal-do-parceiro' | 'ppw' | 'lensly'>('home');
-
-  const navigateToCase = (caseId: string) => {
-    setCurrentPage(caseId as any);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
+  const navigate = useNavigate();
 
   const navigateToHome = () => {
-    setCurrentPage('home');
+    navigate('/');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (
-    <LanguageProvider>
-      <div className="min-h-screen bg-white">
-        {currentPage === 'home' ? (
+    <div className="min-h-screen bg-white">
+      <Routes>
+        <Route
+          path="/"
+          element={
           <>
             <Header onNavigateHome={navigateToHome} />
             <Hero />
-            <FeaturedProjects onProjectClick={navigateToCase} />
+            <FeaturedProjects />
             <About />
             <Footer />
           </>
-        ) : currentPage === 'portal-do-parceiro' ? (
-          <PortalDoParceiro onBackToHome={navigateToHome} />
-        ) : null}
-      </div>
-    </LanguageProvider>
+          }
+        />
+        <Route
+          path="/projetos/portal-do-parceiro"
+          element={<PortalDoParceiro onBackToHome={navigateToHome} />}
+        />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </div>
   );
 }
